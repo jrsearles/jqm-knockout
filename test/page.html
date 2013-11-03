@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title></title>
+	<link rel="stylesheet" href="../lib/jquery.mobile-1.3.2.css">
+	<script type="text/javascript" src="../lib/jquery-1.10.2.js"></script>
+	<script type="text/javascript" src="../lib/jquery.mobile-1.3.2.js"></script>
+	<script type="text/javascript" src="../lib/knockout-3.0.0.debug.js"></script>
+	<script type="text/javascript" src="../src/jqm-knockout.js"></script>
+</head>
+<body>
+
+	<div id="main" data-role="page">
+		<div data-role="header"><h1>Knockout Testing</h1></div>
+
+		<div data-role="content">
+			<label for="cb1">Checkbox</label>
+			<input type="checkbox" id="cb1" data-bind="jqmChecked: active, jqmDisable: disabled" />
+			<button href="#" data-bind="vclick: toggleActive, jqmDisable: disabled" data-role="button">Toggle Checkbox</button>
+
+			<label for="sel1">Country</label>
+			<select data-bind="options: availableCountries, optionsText: 'countryName', jqmValue: selectedCountry, optionsCaption: 'Choose...', jqmDisable: disabled">
+			</select>
+			<a href="#" data-bind="vclick: nextCountry, jqmDisable: disabled" data-role="button">Next Country</a>
+
+			<label for="rng1">Slide</label>
+			<input type="range" data-bind="jqmValue: sliderValue, jqmDisable: disabled" min="0" max="100" />
+			<a href="#" data-bind="vclick: incrementSlider, jqmDisable: disabled" data-role="button">Increment Slider</a>
+
+			<label for="flip-1">Flip switch</label>
+			<select name="flip-1" id="flip-1" data-role="slider" data-bind="jqmValue: flipValue, jqmDisable: disabled">
+			  <option value="0">Off</option>
+			  <option value="1">On</option>
+			</select>
+			<a href="#" data-bind="vclick: toggleFlipValue, jqmDisable: disabled" data-role="button">Toggle Flipper</a> 
+
+			<div data-role="rangeslider">
+			  <label for="range-1a">Rangeslider:</label>
+			  <input name="range-1a" id="range-1a" min="0" max="100" type="range" data-bind="jqmValue: lowValue, jqmDisable: disabled" />
+			  <label for="range-1b">Rangeslider:</label>
+			  <input name="range-1b" id="range-1b" min="0" max="100" type="range" data-bind="jqmValue: highValue, jqmDisable: disabled" />
+			</div>
+			<a href="#" data-bind="vclick: alterRange, jqmDisable: disabled" data-role="button">Alter Range</a>
+
+			<label for="tb1">Textbox</label>
+			<input id="tb1" type="text" data-bind="value: textValue, jqmDisable: disabled" />
+
+			<label for="cb2" data-bind="jqmText: disabledText"></label>
+			<input type="checkbox" id="cb2" data-bind="jqmChecked: disabled" />
+
+			<a href="#page2" data-role="button">Next Page</a>
+		</div>
+	</div>
+
+	<div id="page2" data-role="page">
+		<div data-role="header"><h1>Page 2</h1></div>
+
+		<div data-role="content">
+			<h3>List View</h3>
+			<ul data-role="listview" data-bind="jqmForeach: { data: data, afterRender: afterRender, afterAdd: afterAdd }, visible: data().length > 0">
+				<li data-bind="text: countryName"></li>
+			</ul>
+
+			<h3 data-bind="visible: data().length === 0">No records found</h3>
+
+			<h3>Virtual Elements</h3>
+			<ul data-role="listview">
+				<!-- ko jqmForeach: data -->
+					<li>
+						<span data-bind="text: countryName"></span>
+						<span data-bind="text: countryPopulation" class="ui-li-count"></span>
+					</li>
+				<!-- /ko -->
+			</ul>
+
+			<fieldset data-role="controlgroup">
+				<legend>Select One</legend>
+				<!-- ko jqmForeach: data -->
+				<label data-bind="attr: { 'for': 'rdo' + $index() }, jqmText: countryName"></label>
+				<input name="radio-country" type="radio" data-bind="jqmChecked: $parent.selectedCountry, checkedValue: $data, attr: { id: 'rdo' + $index() }" />
+				<!-- /ko -->
+			</fieldset>
+
+			<fieldset data-bind="with: selectedCountry">
+				<legend>Selected Country</legend>
+
+				<label for="txtCountryName">Name:</label>
+				<input type="text" data-bind="jqmValue: $data.countryName" />
+
+				<label for="txtCountryPopulation">Population:</label>
+				<input type="number" data-bind="jqmValue: $data.countryPopulation" />
+			</fieldset>
+
+			<a href="#" data-bind="vclick: populateData" data-role="button">Populate</a>
+			<a href="#" data-bind="vclick: resetData" data-role="button">Clear</a>
+
+		</div>
+	</div>
+
+	<script>
+
+	var vm;
+
+  var Country = function(name, population) {
+      this.countryName = ko.observable(name);
+      this.countryPopulation = ko.observable(population);
+  };
+
+	$().ready(function() {
+
+    function ViewModel() {
+  		this.active = ko.observable(true);
+  		this.toggleActive = function() {
+  			this.active(!this.active());
+  		};
+
+    	this.disabled = ko.observable(false);
+    	this.disabledText = ko.computed(function() {
+  			return this.disabled() ? "enable" : "disable";
+  		}, this);
+
+    	this.textValue = ko.observable("test value");
+
+    	this.sliderValue = ko.observable(50);
+
+    	this.flipValue = ko.observable(0);
+
+    	this.lowValue = ko.observable(10);
+    	this.highValue = ko.observable(90);
+
+    	this.alterRange = function() {
+  			this.lowValue(Math.floor((Math.random() * 50) + 1));
+  			this.highValue(Math.floor((Math.random() * 50 + 51)));
+  		};
+
+  		this.toggleFlipValue = function() {
+  			var value = this.flipValue();
+  			this.flipValue(value == 1 ? 0 : 1);
+  		};
+
+  		this.incrementSlider = function() {
+  			var value = parseInt(this.sliderValue(), 10) + 5;
+				if (value > 100) {
+					value = 0;
+				}
+
+				this.sliderValue(value);
+  		};
+
+  		this.nextCountry = function() {
+  			var index = 0;
+  			var selected = this.selectedCountry();
+
+  			if (selected) {
+  				index = this.availableCountries.indexOf(selected) + 1;
+  				if (index === this.availableCountries().length) {
+  					index = 0;
+  				}
+  			}
+
+  			this.selectedCountry(this.availableCountries()[index]);
+  		};
+
+      this.availableCountries = ko.observableArray([
+        new Country("UK", 65000000),
+        new Country("USA", 320000000),
+        new Country("Sweden", 29000000)
+      ]);
+
+      this.selectedCountry = ko.observable();
+
+      this.data = ko.observableArray();
+
+      this.populateData = function() {
+      	this.data(this.availableCountries());
+      };
+
+      this.resetData = function() {
+      	this.data([]);
+      };
+
+      this.afterAdd = function() {
+      	//console.log("original after-add");
+      };
+
+      this.afterRender = function() {
+      	//console.log("origina after-render");
+      	//$.mobile.activePage.find("[data-role='listview']").listview("refresh");
+      };
+    }
+
+		ko.applyBindings(vm = new ViewModel());
+
+	});
+
+	</script>
+</body>
+</html>
