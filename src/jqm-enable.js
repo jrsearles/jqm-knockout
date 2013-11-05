@@ -24,7 +24,7 @@ ko.bindingHandlers[enableBindingName] = {
 if (!(disableBindingName in ko.bindingHandlers)) {
 	ko.bindingHandlers[getBindingName("disable")] = {
 		update: function(element, valueAccessor) {
-			ko.bindingHandlers[disableBindingName].update(element, function() { return !ko.unwrap(valueAccessor()); });
+			ko.bindingHandlers[enableBindingName].update(element, function() { return !ko.unwrap(valueAccessor()); });
 		}
 	};
 }

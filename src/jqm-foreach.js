@@ -1,4 +1,6 @@
-ko.bindingHandlers[getBindingName("foreach")] = (function() {
+var foreachBindingName = getBindingName("foreach");
+
+ko.bindingHandlers[foreachBindingName] = (function() {
 	function wrapForEachOptions(element, valueAccessor) {
 		return function() {
 			var modelValue = valueAccessor();
@@ -51,3 +53,5 @@ ko.bindingHandlers[getBindingName("foreach")] = (function() {
 		}	
 	};
 })();
+
+ko.virtualElements.allowedBindings[foreachBindingName] = true;

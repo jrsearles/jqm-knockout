@@ -14,7 +14,7 @@ module.exports = function(grunt) {
 			},
 			dist: {
 				dest: "dist/jqm-knockout.js",
-				src: ["src/**/*"]
+				src: ["src/utils.js", "src/**/*"]
 			}
 		},
 		uglify: {
